@@ -51,7 +51,7 @@
 
         <!-- ================= SECTION: SISWA ================= -->
         <section id="section-siswa" class="space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
+            <div id="siswa-form-box" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
                 <div class="text-center mb-6">
                     <h2 class="text-xl font-bold text-slate-900">Form Kehadiran Siswa Daring</h2>
                     <p class="text-sm text-slate-500">Silakan isi daftar hadir sebelum memasuki ruang belajar</p>
@@ -123,12 +123,15 @@
 
             <!-- Ruang Belajar Siswa -->
             <div id="ruang-belajar-container" class="hidden space-y-6 max-w-4xl mx-auto mt-8">
-                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-2xl shadow flex justify-between items-center">
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-2xl shadow flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h3 class="text-xl font-bold">Ruang Belajar Daring</h3>
                         <p id="info-sesi-belajar" class="text-blue-100 text-sm mt-1">Mata Pelajaran: - | Kelas: -</p>
+                        <div id="info-siswa-login-badge" class="mt-2 inline-block bg-white/20 px-3 py-1 rounded-lg text-xs font-semibold"></div>
                     </div>
-                    <div id="info-siswa-login-badge" class="bg-white/10 px-3 py-1.5 rounded-xl text-xs font-semibold"></div>
+                    <button onclick="logoutSiswa()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar / Ganti Akun
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,8 +203,8 @@
 
                 <div class="flex space-x-2 border-b border-slate-200 overflow-x-auto">
                     <button onclick="switchTabGuru('rekap')" id="gtab-rekap" class="px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 text-sm whitespace-nowrap">Rekap Absen</button>
-                    <button onclick="switchTabGuru('materi')" id="gtab-materi" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat Materi</button>
-                    <button onclick="switchTabGuru('tugas')" id="gtab-tugas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat Tugas</button>
+                    <button onclick="switchTabGuru('materi')" id="gtab-materi" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat & Kelola Materi</button>
+                    <button onclick="switchTabGuru('tugas')" id="gtab-tugas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat & Kelola Tugas</button>
                     <button onclick="switchTabGuru('jawaban')" id="gtab-jawaban" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Tugas Masuk</button>
                 </div>
 
@@ -228,8 +231,9 @@
                     </div>
                 </div>
 
-                <div id="gcontent-materi" class="hidden space-y-4">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl">
+                <!-- Tab Materi & Riwayat -->
+                <div id="gcontent-materi" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <h4 class="font-bold text-slate-800 mb-4">Publikasi Materi Pembelajaran</h4>
                         <form onsubmit="publishMateri(event)" class="space-y-4">
                             <div>
@@ -255,10 +259,27 @@
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow">Publikasikan Materi</button>
                         </form>
                     </div>
+
+                    <!-- Riwayat Materi Guru -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
+                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Materi yang Dipublikasikan</h4>
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b">
+                                    <th class="p-3">Judul</th>
+                                    <th class="p-3">Kelas Target</th>
+                                    <th class="p-3">Isi Ringkas</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-riwayat-materi"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div id="gcontent-tugas" class="hidden space-y-4">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-2xl">
+                <!-- Tab Tugas & Riwayat -->
+                <div id="gcontent-tugas" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <h4 class="font-bold text-slate-800 mb-4">Buat Penugasan & Latihan Siswa</h4>
                         <form onsubmit="publishTugas(event)" class="space-y-4">
                             <div>
@@ -283,6 +304,22 @@
                             </div>
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow">Publikasikan Tugas</button>
                         </form>
+                    </div>
+
+                    <!-- Riwayat Tugas Guru -->
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
+                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Tugas yang Dipublikasikan</h4>
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 border-b">
+                                    <th class="p-3">Judul Tugas</th>
+                                    <th class="p-3">Kelas Target</th>
+                                    <th class="p-3">Instruksi Ringkas</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-riwayat-tugas"></tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -498,6 +535,7 @@
             if(currentGuru) activateGuruDashboard();
             if(isAdminLoggedIn) activateAdminDashboard();
             if(currentSiswaSession) {
+                document.getElementById('siswa-form-box').classList.add('hidden');
                 document.getElementById('ruang-belajar-container').classList.remove('hidden');
                 document.getElementById('info-sesi-belajar').innerText = `Mata Pelajaran: ${currentSiswaSession.mapel} | Kelas: ${currentSiswaSession.kelas}`;
                 document.getElementById('info-siswa-login-badge').innerText = `Siswa: ${currentSiswaSession.nama}`;
@@ -528,7 +566,7 @@
                 jSnap.forEach(d => dbJawabanSiswa.push({ id: d.id, ...d.data() }));
 
                 renderSiswaDBTable();
-                if(currentGuru) { renderRekapGuru(); renderJawabanGuru(); }
+                if(currentGuru) { renderRekapGuru(); renderJawabanGuru(); renderRiwayatGuru(); }
                 if(isAdminLoggedIn) { renderRekapAdmin(); renderRekapPerKelas(); }
             } catch(err) {
                 console.error("Gagal sinkronisasi cloud:", err);
@@ -626,6 +664,7 @@
                 localStorage.setItem('smpn2_current_siswa_session', JSON.stringify(currentSiswaSession));
 
                 alert("Absensi berhasil dikirim ke Cloud! Anda diarahkan ke Ruang Belajar.");
+                document.getElementById('siswa-form-box').classList.add('hidden');
                 document.getElementById('ruang-belajar-container').classList.remove('hidden');
                 document.getElementById('info-sesi-belajar').innerText = `Mata Pelajaran: ${mapel} | Kelas: ${kelas}`;
                 document.getElementById('info-siswa-login-badge').innerText = `Siswa: ${nama}`;
@@ -633,6 +672,17 @@
             } catch(err) {
                 alert("Gagal mengirim absen: " + err.message);
             }
+        }
+
+        window.logoutSiswa = function() {
+            localStorage.removeItem('smpn2_current_siswa_session');
+            currentSiswaSession = null;
+            document.getElementById('ruang-belajar-container').classList.add('hidden');
+            document.getElementById('siswa-form-box').classList.remove('hidden');
+            document.getElementById('form-absen').reset();
+            document.getElementById('s-nama').disabled = true;
+            document.getElementById('s-nama').className = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-500";
+            document.getElementById('s-nama').innerHTML = '<option value="">-- Pilih kelas terlebih dahulu --</option>';
         }
 
         window.loadRuangBelajarSiswa = function(mapel, kelas) {
@@ -723,6 +773,7 @@
             populateKelasDropdowns();
             renderRekapGuru();
             renderJawabanGuru();
+            renderRiwayatGuru();
         }
 
         window.logoutGuru = function() {
@@ -740,6 +791,7 @@
             document.getElementById(`gcontent-${tab}`).classList.remove('hidden');
             document.getElementById(`gtab-${tab}`).className = "px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 text-sm whitespace-nowrap";
             if(tab === 'jawaban') renderJawabanGuru();
+            if(tab === 'materi' || tab === 'tugas') renderRiwayatGuru();
         }
 
         function renderRekapGuru() {
@@ -772,6 +824,62 @@
                     <td class="p-3 text-slate-700 whitespace-pre-line">${j.jawaban}</td>
                 </tr>
             `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada tugas masuk dari siswa.</td></tr>`;
+        }
+
+        function renderRiwayatGuru() {
+            if(!currentGuru) return;
+            
+            // Riwayat Materi
+            const tbMateri = document.getElementById('tabel-riwayat-materi');
+            const mFiltered = dbMateri.filter(m => m.mapel === currentGuru.mapel);
+            tbMateri.innerHTML = mFiltered.length ? mFiltered.map(m => `
+                <tr class="border-b hover:bg-slate-50 text-xs">
+                    <td class="p-3 font-bold text-slate-800">${m.judul}</td>
+                    <td class="p-3">${m.kelas.join(', ')}</td>
+                    <td class="p-3 text-slate-600 truncate max-w-xs">${m.isi}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="hapusMateri('${m.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 rounded font-bold">Hapus</button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada riwayat materi.</td></tr>`;
+
+            // Riwayat Tugas
+            const tbTugas = document.getElementById('tabel-riwayat-tugas');
+            const tFiltered = dbTugas.filter(t => t.mapel === currentGuru.mapel);
+            tbTugas.innerHTML = tFiltered.length ? tFiltered.map(t => `
+                <tr class="border-b hover:bg-slate-50 text-xs">
+                    <td class="p-3 font-bold text-slate-800">${t.judul}</td>
+                    <td class="p-3">${t.kelas.join(', ')}</td>
+                    <td class="p-3 text-slate-600 truncate max-w-xs">${t.isi}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="hapusTugas('${t.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 rounded font-bold">Hapus</button>
+                    </td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada riwayat tugas.</td></tr>`;
+        }
+
+        window.hapusMateri = async function(id) {
+            if(confirm("Yakin ingin menghapus materi ini?")) {
+                try {
+                    await deleteDoc(doc(db, "materi", id));
+                    await fetchAllDataFromCloud();
+                    alert("Materi berhasil dihapus.");
+                } catch(err) {
+                    alert("Gagal menghapus: " + err.message);
+                }
+            }
+        }
+
+        window.hapusTugas = async function(id) {
+            if(confirm("Yakin ingin menghapus tugas ini?")) {
+                try {
+                    await deleteDoc(doc(db, "tugas", id));
+                    await fetchAllDataFromCloud();
+                    alert("Tugas berhasil dihapus.");
+                } catch(err) {
+                    alert("Gagal menghapus: " + err.message);
+                }
+            }
         }
 
         window.publishMateri = async function(e) {
@@ -991,7 +1099,7 @@
                 for(let idx = 0; idx < rows.length; idx++) {
                     if(idx === 0) continue;
                     const rowLine = rows[idx].trim();
-                    if(!rowLine) continue; // Lewati baris kosong
+                    if(!rowLine) continue;
 
                     const cols = rowLine.split(',');
                     if(cols.length >= 2) {
