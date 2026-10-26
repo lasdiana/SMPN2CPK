@@ -462,7 +462,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Anda yang sudah dimasukkan otomatis
         const firebaseConfig = {
             apiKey: "AIzaSyCZFnVZ3jeH85lb3tj73zAdhjbIKHcBqfc",
             authDomain: "smpn2-cipongkor-absen.firebaseapp.com",
@@ -991,7 +990,10 @@
 
                 for(let idx = 0; idx < rows.length; idx++) {
                     if(idx === 0) continue;
-                    const cols = rows[idx].split(',');
+                    const rowLine = rows[idx].trim();
+                    if(!rowLine) continue; // Lewati baris kosong
+
+                    const cols = rowLine.split(',');
                     if(cols.length >= 2) {
                         const nama = cols[0].trim().replace(/"/g, '');
                         const kelas = cols[1].trim().replace(/"/g, '');
