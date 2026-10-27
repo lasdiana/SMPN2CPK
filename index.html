@@ -123,15 +123,34 @@
 
             <!-- Ruang Belajar Siswa -->
             <div id="ruang-belajar-container" class="hidden space-y-6 max-w-4xl mx-auto mt-8">
-                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-6 rounded-2xl shadow flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-5 md:p-6 rounded-2xl shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex-1">
                         <h3 class="text-xl font-bold">Ruang Belajar Daring</h3>
                         <p id="info-sesi-belajar" class="text-blue-100 text-sm mt-1">Mata Pelajaran: - | Kelas: -</p>
                         <div id="info-siswa-login-badge" class="mt-2 inline-block bg-white/20 px-3 py-1 rounded-lg text-xs font-semibold"></div>
                     </div>
-                    <button onclick="logoutSiswa()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar / Ganti Akun
-                    </button>
+                    
+                    <div class="bg-white/10 p-3 rounded-xl border border-white/20 w-full md:w-auto md:min-w-[250px]">
+                        <label class="block text-xs font-semibold text-blue-100 mb-1"><i class="fa-solid fa-rotate mr-1"></i> Lanjut ke Mapel Lain:</label>
+                        <select id="s-ganti-mapel" onchange="gantiMapelSiswa(this.value)" class="w-full text-slate-800 text-sm px-3 py-2 rounded-lg focus:outline-none bg-white">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="IPA">IPA</option>
+                            <option value="IPS">IPS</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            <option value="PAI">PAI</option>
+                            <option value="PJOK">PJOK</option>
+                            <option value="Seni Budaya">Seni Budaya</option>
+                            <option value="PKn">PKn</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Bahasa Sunda">Bahasa Sunda</option>
+                            <option value="Prakarya">Prakarya</option>
+                        </select>
+                        <button onclick="logoutSiswaUtuh()" class="mt-2 w-full bg-red-500/80 hover:bg-red-600 text-white text-xs font-bold py-2 rounded-lg transition shadow">
+                            <i class="fa-solid fa-power-off mr-1"></i> Selesai Belajar
+                        </button>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -139,7 +158,7 @@
                         <h4 class="font-bold text-slate-800 mb-3 flex items-center">
                             <i class="fa-solid fa-book-open text-blue-600 mr-2"></i> Materi Pembelajaran
                         </h4>
-                        <div id="list-materi-siswa" class="space-y-3">
+                        <div id="list-materi-siswa" class="space-y-4">
                             <p class="text-sm text-slate-400 italic">Belum ada materi untuk mapel ini.</p>
                         </div>
                     </div>
@@ -148,7 +167,7 @@
                         <h4 class="font-bold text-slate-800 mb-3 flex items-center">
                             <i class="fa-solid fa-file-pen text-indigo-600 mr-2"></i> Tugas & Penugasan
                         </h4>
-                        <div id="list-tugas-siswa" class="space-y-3">
+                        <div id="list-tugas-siswa" class="space-y-4">
                             <p class="text-sm text-slate-400 italic">Belum ada tugas untuk mapel ini.</p>
                         </div>
                     </div>
@@ -161,12 +180,16 @@
             <div id="guru-login-box" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-md mx-auto">
                 <div class="text-center mb-6">
                     <h2 class="text-xl font-bold text-slate-900">Login Guru Mata Pelajaran</h2>
-                    <p class="text-sm text-slate-500">Masukkan nama dan pilih mata pelajaran Anda</p>
+                    <p class="text-sm text-slate-500">Masukkan identitas dan tautan Google Drive Anda</p>
                 </div>
                 <form onsubmit="loginGuru(event)" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Guru & Gelar</label>
                         <input type="text" id="g-nama-login" required placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">NIP (Nomor Induk Pegawai)</label>
+                        <input type="text" id="g-nip-login" required placeholder="Masukkan NIP Anda" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Mata Pelajaran yang Diampu</label>
@@ -186,6 +209,11 @@
                             <option value="Prakarya">Prakarya</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Link Google Drive Pengumpulan Tugas</label>
+                        <input type="url" id="g-drive-login" required placeholder="https://drive.google.com/drive/folders/..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-slate-400 mt-1">*Link folder Google Drive Anda agar siswa bisa mengunggah tugas.</p>
+                    </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow">
                         Masuk Dashboard Guru <i class="fa-solid fa-right-to-bracket ml-1"></i>
                     </button>
@@ -197,14 +225,15 @@
                     <div>
                         <span id="badge-guru-info" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">Guru Mapel</span>
                         <h3 id="label-guru-nama" class="text-xl font-bold text-slate-900 mt-1">Nama Guru</h3>
+                        <p id="label-guru-drive" class="text-xs text-blue-600 mt-1 font-medium"></p>
                     </div>
                     <button onclick="logoutGuru()" class="text-sm text-red-600 hover:underline font-medium">Keluar Akun</button>
                 </div>
 
                 <div class="flex space-x-2 border-b border-slate-200 overflow-x-auto">
                     <button onclick="switchTabGuru('rekap')" id="gtab-rekap" class="px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 text-sm whitespace-nowrap">Rekap Absen</button>
-                    <button onclick="switchTabGuru('materi')" id="gtab-materi" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat & Kelola Materi</button>
-                    <button onclick="switchTabGuru('tugas')" id="gtab-tugas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Buat & Kelola Tugas</button>
+                    <button onclick="switchTabGuru('materi')" id="gtab-materi" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Kelola Materi</button>
+                    <button onclick="switchTabGuru('tugas')" id="gtab-tugas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Kelola Tugas</button>
                     <button onclick="switchTabGuru('jawaban')" id="gtab-jawaban" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Tugas Masuk</button>
                 </div>
 
@@ -234,26 +263,39 @@
                 <!-- Tab Materi & Riwayat -->
                 <div id="gcontent-materi" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h4 class="font-bold text-slate-800 mb-4">Publikasi Materi Pembelajaran</h4>
+                        <h4 class="font-bold text-slate-800 mb-4">Publikasi Materi Pembelajaran (Bisa Terjadwal)</h4>
                         <form onsubmit="publishMateri(event)" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Mata Pelajaran (Terkunci)</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Mata Pelajaran</label>
                                 <input type="text" id="gm-mapel" disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 font-semibold">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Target Kelas</label>
                                 <div id="checkbox-target-kelas-materi" class="grid grid-cols-3 md:grid-cols-6 gap-2 p-3 border rounded-xl bg-slate-50 max-h-48 overflow-y-auto"></div>
                             </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                <div>
+                                    <label class="block text-sm font-semibold text-amber-900 mb-1"><i class="fa-regular fa-calendar-plus mr-1"></i> Jadwal Mulai Buka</label>
+                                    <input type="datetime-local" id="gm-buka" required class="w-full px-4 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-amber-900 mb-1"><i class="fa-regular fa-calendar-xmark mr-1"></i> Jadwal Tutup Akses</label>
+                                    <input type="datetime-local" id="gm-tutup" required class="w-full px-4 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <p class="col-span-1 md:col-span-2 text-xs text-amber-700 italic">Siswa akan melihat Timer (Hitung Mundur) saat materi/tugas sedang berlangsung.</p>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Judul Materi</label>
                                 <input type="text" id="gm-judul" required placeholder="Contoh: Modul 1" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Isi Ringkasan / Link</label>
-                                <textarea id="gm-isi" rows="4" required placeholder="Tuliskan materi..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Isi Ringkasan / Link Youtube</label>
+                                <textarea id="gm-isi" rows="4" required placeholder="Ketik materi atau tempelkan link video YouTube di sini..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Lampiran (Opsional)</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Lampiran File (Opsional)</label>
                                 <input type="file" id="gm-file" accept=".pdf,image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-blue-50 file:text-blue-700">
                             </div>
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow">Publikasikan Materi</button>
@@ -262,13 +304,13 @@
 
                     <!-- Riwayat Materi Guru -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Materi yang Dipublikasikan</h4>
+                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Materi (Termasuk Jadwal)</h4>
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 border-b">
+                                    <th class="p-3">Jadwal Akses</th>
                                     <th class="p-3">Judul</th>
-                                    <th class="p-3">Kelas Target</th>
-                                    <th class="p-3">Isi Ringkas</th>
+                                    <th class="p-3">Kelas</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -280,26 +322,38 @@
                 <!-- Tab Tugas & Riwayat -->
                 <div id="gcontent-tugas" class="hidden space-y-6">
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h4 class="font-bold text-slate-800 mb-4">Buat Penugasan & Latihan Siswa</h4>
+                        <h4 class="font-bold text-slate-800 mb-4">Buat Penugasan & Latihan (Bisa Terjadwal)</h4>
                         <form onsubmit="publishTugas(event)" class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Mata Pelajaran (Terkunci)</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Mata Pelajaran</label>
                                 <input type="text" id="gt-mapel" disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 font-semibold">
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Target Kelas</label>
                                 <div id="checkbox-target-kelas-tugas" class="grid grid-cols-3 md:grid-cols-6 gap-2 p-3 border rounded-xl bg-slate-50 max-h-48 overflow-y-auto"></div>
                             </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-xl border border-amber-200">
+                                <div>
+                                    <label class="block text-sm font-semibold text-amber-900 mb-1"><i class="fa-regular fa-calendar-plus mr-1"></i> Jadwal Mulai Buka</label>
+                                    <input type="datetime-local" id="gt-buka" required class="w-full px-4 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-amber-900 mb-1"><i class="fa-regular fa-calendar-xmark mr-1"></i> Jadwal Tutup Akses</label>
+                                    <input type="datetime-local" id="gt-tutup" required class="w-full px-4 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                                </div>
+                            </div>
+
                             <div>
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">Judul Tugas</label>
                                 <input type="text" id="gt-judul" required placeholder="Contoh: Tugas 1" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Instruksi</label>
-                                <textarea id="gt-isi" rows="4" required placeholder="Tulis instruksi..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Instruksi Tugas</label>
+                                <textarea id="gt-isi" rows="4" required placeholder="Tulis instruksi atau link YouTube materi tugas..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-slate-700 mb-1">Lampiran (Opsional)</label>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Lampiran Soal (Opsional)</label>
                                 <input type="file" id="gt-file" accept=".pdf,image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700">
                             </div>
                             <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2.5 rounded-xl transition shadow">Publikasikan Tugas</button>
@@ -308,13 +362,13 @@
 
                     <!-- Riwayat Tugas Guru -->
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Tugas yang Dipublikasikan</h4>
+                        <h4 class="font-bold text-slate-800 mb-3">Riwayat Tugas (Termasuk Jadwal)</h4>
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 border-b">
+                                    <th class="p-3">Jadwal Akses</th>
                                     <th class="p-3">Judul Tugas</th>
-                                    <th class="p-3">Kelas Target</th>
-                                    <th class="p-3">Instruksi Ringkas</th>
+                                    <th class="p-3">Kelas</th>
                                     <th class="p-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
@@ -325,7 +379,7 @@
 
                 <div id="gcontent-jawaban" class="hidden space-y-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-                        <h4 class="font-bold text-slate-800 mb-4">Folder Tugas Masuk Siswa</h4>
+                        <h4 class="font-bold text-slate-800 mb-4">Folder Konfirmasi Tugas Masuk Siswa</h4>
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 border-b">
@@ -333,7 +387,7 @@
                                     <th class="p-3">Nama Siswa</th>
                                     <th class="p-3">Kelas</th>
                                     <th class="p-3">Judul Tugas</th>
-                                    <th class="p-3">Jawaban / Catatan</th>
+                                    <th class="p-3">Konfirmasi / Catatan</th>
                                 </tr>
                             </thead>
                             <tbody id="tabel-jawaban-guru"></tbody>
@@ -369,14 +423,15 @@
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
                     <div>
                         <span class="bg-slate-900 text-white text-xs font-bold px-3 py-1 rounded-full">Administrator Sekolah</span>
-                        <h3 class="text-xl font-bold text-slate-900 mt-1">Panel Kendali Utama (Cloud Connected)</h3>
+                        <h3 class="text-xl font-bold text-slate-900 mt-1">Panel Kendali Utama</h3>
                     </div>
                     <button onclick="logoutAdmin()" class="text-sm text-red-600 hover:underline font-medium">Keluar Admin</button>
                 </div>
 
                 <div class="flex space-x-2 border-b border-slate-200 overflow-x-auto">
                     <button onclick="switchTabAdmin('rekap')" id="atab-rekap" class="px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 text-sm whitespace-nowrap">Semua Rekap</button>
-                    <button onclick="switchTabAdmin('perkelas')" id="atab-perkelas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Rekap Per Kelas</button>
+                    <button onclick="switchTabAdmin('perkelas')" id="atab-perkelas" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Rekap Per Kelas & Mapel</button>
+                    <button onclick="switchTabAdmin('materi')" id="atab-materi" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Dasbor Materi & Tugas</button>
                     <button onclick="switchTabAdmin('siswa')" id="atab-siswa" class="px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap">Kelola Data Siswa</button>
                 </div>
 
@@ -411,7 +466,24 @@
                             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Kelas</label>
-                                    <select id="filter-rekap-kelas" onchange="renderRekapPerKelas()" class="px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select id="filter-rekap-kelas" onchange="renderRekapPerKelas()" class="px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Mata Pelajaran</label>
+                                    <select id="filter-rekap-mapel" onchange="renderRekapPerKelas()" class="px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option value="">Semua Mata Pelajaran</option>
+                                        <option value="Matematika">Matematika</option>
+                                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                                        <option value="IPA">IPA</option>
+                                        <option value="IPS">IPS</option>
+                                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                                        <option value="PAI">PAI</option>
+                                        <option value="PJOK">PJOK</option>
+                                        <option value="Seni Budaya">Seni Budaya</option>
+                                        <option value="PKn">PKn</option>
+                                        <option value="Informatika">Informatika</option>
+                                        <option value="Bahasa Sunda">Bahasa Sunda</option>
+                                        <option value="Prakarya">Prakarya</option>
                                     </select>
                                 </div>
                                 <div>
@@ -425,7 +497,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow">
-                                    <i class="fa-solid fa-print mr-1"></i> Cetak / Print PDF
+                                    <i class="fa-solid fa-print mr-1"></i> Cetak PDF
                                 </button>
                                 <button onclick="exportRekapPerKelas()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow">
                                     <i class="fa-solid fa-file-excel mr-1"></i> Unduh Excel
@@ -436,20 +508,59 @@
                         <div id="printable-area" class="overflow-x-auto bg-white p-4 rounded-xl">
                             <div class="hidden print:block mb-4 text-center">
                                 <h2 class="font-bold text-lg">LAPORAN KEHADIRAN SISWA SMPN 2 CIPONGKOR</h2>
-                                <p id="print-subtitle" class="text-xs text-slate-600">Kelas: - | Periode: -</p>
+                                <p id="print-subtitle" class="text-xs text-slate-600">Kelas: - | Mapel: - | Periode: -</p>
                             </div>
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 border-b">
                                         <th class="p-3">Waktu</th>
                                         <th class="p-3">Nama Siswa</th>
-                                        <th class="p-3">Mata Pelajaran</th>
+                                        <th class="p-3 text-blue-700 font-bold">Mata Pelajaran</th>
+                                        <th class="p-3">Kelas</th>
                                         <th class="p-3">Status</th>
                                         <th class="p-3">Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabel-rekap-perkelas"></tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dasbor Materi & Tugas Guru untuk Admin -->
+                <div id="acontent-materi" class="hidden space-y-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-6">
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-3">Daftar Materi yang Dibuat Guru</h4>
+                            <div class="overflow-x-auto border rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b text-slate-600">
+                                            <th class="p-3">Mata Pelajaran</th>
+                                            <th class="p-3">Judul Materi</th>
+                                            <th class="p-3">Kelas Target</th>
+                                            <th class="p-3">Isi Materi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-tabel-materi"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-3">Daftar Tugas yang Dibuat Guru</h4>
+                            <div class="overflow-x-auto border rounded-xl">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-100 border-b text-slate-600">
+                                            <th class="p-3">Mata Pelajaran</th>
+                                            <th class="p-3">Judul Tugas</th>
+                                            <th class="p-3">Kelas Target</th>
+                                            <th class="p-3">Instruksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-tabel-tugas"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -527,6 +638,29 @@
         let currentGuru = JSON.parse(localStorage.getItem('smpn2_current_guru')) || null;
         let currentSiswaSession = JSON.parse(localStorage.getItem('smpn2_current_siswa_session')) || null;
         let isAdminLoggedIn = localStorage.getItem('smpn2_admin_logged') === 'true';
+        let countdownTimerInterval = null;
+
+        function formatTeksDanYouTube(text) {
+            if (!text) return '';
+            let formatTeks = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:\S+)?/g;
+            formatTeks = formatTeks.replace(ytRegex, (match, vidId) => {
+                return `<div class="my-3 overflow-hidden rounded-xl shadow-md border border-slate-200"><iframe class="w-full aspect-video" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+            });
+            
+            const urlRegex = /(?<!src=")(https?:\/\/[^\s<]+)(?!")/g;
+            formatTeks = formatTeks.replace(urlRegex, (url) => {
+                return `<a href="${url}" target="_blank" class="text-blue-600 hover:underline break-all"><i class="fa-solid fa-link mr-1"></i>Buka Tautan</a>`;
+            });
+            
+            return formatTeks;
+        }
+
+        function formatTanggalPendek(timestamp) {
+            if(!timestamp) return "-";
+            return new Date(timestamp).toLocaleString('id-ID', {dateStyle: 'medium', timeStyle: 'short'});
+        }
 
         window.onload = async function() {
             populateKelasDropdowns();
@@ -546,28 +680,23 @@
         async function fetchAllDataFromCloud() {
             try {
                 const sSnap = await getDocs(collection(db, "siswa"));
-                dbSiswa = [];
-                sSnap.forEach(d => dbSiswa.push({ id: d.id, ...d.data() }));
+                dbSiswa = []; sSnap.forEach(d => dbSiswa.push({ id: d.id, ...d.data() }));
 
                 const aSnap = await getDocs(collection(db, "absen"));
-                dbAbsen = [];
-                aSnap.forEach(d => dbAbsen.push({ id: d.id, ...d.data() }));
+                dbAbsen = []; aSnap.forEach(d => dbAbsen.push({ id: d.id, ...d.data() }));
 
                 const mSnap = await getDocs(collection(db, "materi"));
-                dbMateri = [];
-                mSnap.forEach(d => dbMateri.push({ id: d.id, ...d.data() }));
+                dbMateri = []; mSnap.forEach(d => dbMateri.push({ id: d.id, ...d.data() }));
 
                 const tSnap = await getDocs(collection(db, "tugas"));
-                dbTugas = [];
-                tSnap.forEach(d => dbTugas.push({ id: d.id, ...d.data() }));
+                dbTugas = []; tSnap.forEach(d => dbTugas.push({ id: d.id, ...d.data() }));
 
                 const jSnap = await getDocs(collection(db, "jawaban"));
-                dbJawabanSiswa = [];
-                jSnap.forEach(d => dbJawabanSiswa.push({ id: d.id, ...d.data() }));
+                dbJawabanSiswa = []; jSnap.forEach(d => dbJawabanSiswa.push({ id: d.id, ...d.data() }));
 
                 renderSiswaDBTable();
                 if(currentGuru) { renderRekapGuru(); renderJawabanGuru(); renderRiwayatGuru(); }
-                if(isAdminLoggedIn) { renderRekapAdmin(); renderRekapPerKelas(); }
+                if(isAdminLoggedIn) { renderRekapAdmin(); renderRekapPerKelas(); renderAdminDasborMateriTugas(); }
             } catch(err) {
                 console.error("Gagal sinkronisasi cloud:", err);
             }
@@ -674,63 +803,175 @@
             }
         }
 
-        window.logoutSiswa = function() {
+        window.gantiMapelSiswa = async function(newMapel) {
+            if(!newMapel || !currentSiswaSession) return;
+            const todayStr = new Date().toISOString().split('T')[0];
+            const alreadyAbsen = dbAbsen.find(a => a.nama === currentSiswaSession.nama && a.mapel === newMapel && a.rawDate === todayStr);
+
+            if(!alreadyAbsen) {
+                const now = new Date();
+                const newAbsen = {
+                    rawDate: todayStr,
+                    waktu: now.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+                    kelas: currentSiswaSession.kelas,
+                    nama: currentSiswaSession.nama,
+                    mapel: newMapel,
+                    status: 'Hadir',
+                    catatan: 'Pindah mapel (Otomatis)',
+                    timestamp: Date.now()
+                };
+                try {
+                    await addDoc(collection(db, "absen"), newAbsen);
+                    await fetchAllDataFromCloud(); 
+                } catch(err) { console.error("Gagal auto absen:", err); }
+            }
+            currentSiswaSession.mapel = newMapel;
+            localStorage.setItem('smpn2_current_siswa_session', JSON.stringify(currentSiswaSession));
+            document.getElementById('info-sesi-belajar').innerText = `Mata Pelajaran: ${currentSiswaSession.mapel} | Kelas: ${currentSiswaSession.kelas}`;
+            document.getElementById('s-ganti-mapel').value = ""; 
+            
+            loadRuangBelajarSiswa(currentSiswaSession.mapel, currentSiswaSession.kelas);
+        }
+
+        window.logoutSiswaUtuh = function() {
+            if(countdownTimerInterval) clearInterval(countdownTimerInterval);
             localStorage.removeItem('smpn2_current_siswa_session');
             currentSiswaSession = null;
             document.getElementById('ruang-belajar-container').classList.add('hidden');
             document.getElementById('siswa-form-box').classList.remove('hidden');
             document.getElementById('form-absen').reset();
             document.getElementById('s-nama').disabled = true;
-            document.getElementById('s-nama').className = "w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-500";
             document.getElementById('s-nama').innerHTML = '<option value="">-- Pilih kelas terlebih dahulu --</option>';
         }
 
+        // FUNGSI RENDER RUANG BELAJAR DENGAN LOGIKA WAKTU
         window.loadRuangBelajarSiswa = function(mapel, kelas) {
+            if(countdownTimerInterval) clearInterval(countdownTimerInterval);
+
             const listMateri = document.getElementById('list-materi-siswa');
             const listTugas = document.getElementById('list-tugas-siswa');
+            const now = Date.now();
 
             const mFiltered = dbMateri.filter(m => m.mapel === mapel && m.kelas.includes(kelas));
             const tFiltered = dbTugas.filter(t => t.mapel === mapel && t.kelas.includes(kelas));
 
-            listMateri.innerHTML = mFiltered.length ? mFiltered.map(m => `
-                <div class="p-3 bg-slate-50 rounded-xl border space-y-2">
-                    <h5 class="font-bold text-slate-800 text-sm">${m.judul}</h5>
-                    <p class="text-xs text-slate-600 whitespace-pre-line">${m.isi}</p>
-                    ${m.fileData ? `<a href="${m.fileData}" download="${m.fileName}" class="inline-block bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs font-bold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-download mr-1"></i> Unduh Lampiran (${m.fileName})</a>` : ''}
-                </div>
-            `).join('') : '<p class="text-sm text-slate-400 italic">Belum ada materi dipublikasikan.</p>';
+            // RENDER MATERI
+            listMateri.innerHTML = mFiltered.length ? mFiltered.map(m => {
+                const buka = m.waktuBuka || 0; 
+                const tutup = m.waktuTutup || 4102444800000; // default aman (thn 2100)
 
-            listTugas.innerHTML = tFiltered.length ? tFiltered.map(t => {
-                const sudahKirim = dbJawabanSiswa.find(j => j.tugasId === t.id && j.namaSiswa === currentSiswaSession?.nama);
-                return `
-                    <div class="p-3 bg-slate-50 rounded-xl border space-y-2">
-                        <h5 class="font-bold text-slate-800 text-sm">${t.judul}</h5>
-                        <p class="text-xs text-slate-600 whitespace-pre-line">${t.isi}</p>
-                        ${t.fileData ? `<a href="${t.fileData}" download="${t.fileName}" class="inline-block bg-indigo-100 text-indigo-700 hover:bg-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg"><i class="fa-solid fa-download mr-1"></i> Unduh File Tugas (${t.fileName})</a>` : ''}
-                        
-                        <div class="mt-2 pt-2 border-t space-y-2">
-                            ${sudahKirim ? `
-                                <div class="bg-green-50 text-green-700 p-2 rounded-lg text-xs font-semibold flex items-center justify-between">
-                                    <span><i class="fa-solid fa-circle-check mr-1"></i> Tugas Selesai Dikirim (${sudahKirim.waktu})</span>
-                                </div>
-                                <p class="text-xs text-slate-500 italic">Catatan Anda: "${sudahKirim.jawaban}"</p>
-                            ` : `
-                                <textarea id="jawaban-${t.id}" placeholder="Tulis jawaban, kesimpulan, atau link tugas di sini..." rows="2" class="w-full px-3 py-1.5 text-xs rounded-lg border focus:outline-none focus:ring-1 focus:ring-indigo-500"></textarea>
-                                <button onclick="kirimTugasSelesai('${t.id}', '${t.judul.replace(/'/g, "")}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded-lg font-bold transition">
-                                    Tandai Selesai & Kirim ke Guru <i class="fa-solid fa-paper-plane ml-1"></i>
-                                </button>
-                            `}
+                if (now < buka) {
+                    return `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 opacity-80">
+                        <h5 class="font-bold text-slate-800 text-sm border-b pb-2"><i class="fa-solid fa-lock text-slate-400 mr-1"></i> ${m.judul}</h5>
+                        <p class="text-xs text-slate-600 mt-2">Materi ini akan dibuka pada: <b>${formatTanggalPendek(buka)}</b></p>
+                        <div class="mt-2 text-xs font-bold text-blue-600 timer-element" data-target="${buka}">Menghitung waktu...</div>
+                    </div>`;
+                } else if (now > tutup) {
+                    return `<div class="p-4 bg-red-50 rounded-xl border border-red-100 opacity-70">
+                        <h5 class="font-bold text-red-900 text-sm border-b border-red-200 pb-2"><i class="fa-solid fa-lock text-red-400 mr-1"></i> ${m.judul}</h5>
+                        <p class="text-xs text-red-700 mt-2">Waktu akses materi ini telah berakhir pada <b>${formatTanggalPendek(tutup)}</b>.</p>
+                    </div>`;
+                } else {
+                    return `<div class="p-4 bg-white rounded-xl border border-blue-100 shadow-sm space-y-3">
+                        <div class="flex justify-between items-start border-b pb-2">
+                            <h5 class="font-bold text-slate-800 text-sm">${m.judul}</h5>
+                            <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap timer-element" data-target="${tutup}">Sisa Waktu...</span>
                         </div>
-                    </div>
-                `;
+                        <div class="text-sm text-slate-600 leading-relaxed space-y-2">${formatTeksDanYouTube(m.isi)}</div>
+                        ${m.fileData ? `<a href="${m.fileData}" download="${m.fileName}" class="inline-block mt-2 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-bold px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-download mr-1"></i> Unduh Lampiran</a>` : ''}
+                    </div>`;
+                }
+            }).join('') : '<p class="text-sm text-slate-400 italic">Belum ada materi untuk Anda.</p>';
+
+            // RENDER TUGAS
+            listTugas.innerHTML = tFiltered.length ? tFiltered.map(t => {
+                const buka = t.waktuBuka || 0; 
+                const tutup = t.waktuTutup || 4102444800000;
+                
+                if (now < buka) {
+                    return `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 opacity-80">
+                        <h5 class="font-bold text-slate-800 text-sm border-b pb-2"><i class="fa-solid fa-lock text-slate-400 mr-1"></i> ${t.judul}</h5>
+                        <p class="text-xs text-slate-600 mt-2">Tugas ini akan dibuka pada: <b>${formatTanggalPendek(buka)}</b></p>
+                        <div class="mt-2 text-xs font-bold text-blue-600 timer-element" data-target="${buka}">Menghitung waktu...</div>
+                    </div>`;
+                } else if (now > tutup) {
+                    return `<div class="p-4 bg-red-50 rounded-xl border border-red-100 opacity-70">
+                        <h5 class="font-bold text-red-900 text-sm border-b border-red-200 pb-2"><i class="fa-solid fa-lock text-red-400 mr-1"></i> ${t.judul}</h5>
+                        <p class="text-xs text-red-700 mt-2">Batas waktu pengerjaan tugas telah berakhir pada <b>${formatTanggalPendek(tutup)}</b>.</p>
+                    </div>`;
+                } else {
+                    const sudahKirim = dbJawabanSiswa.find(j => j.tugasId === t.id && j.namaSiswa === currentSiswaSession?.nama);
+                    const driveLink = (t.driveLink && t.driveLink !== '#') ? t.driveLink : null;
+
+                    return `<div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-3">
+                        <div class="flex justify-between items-start border-b pb-2">
+                            <h5 class="font-bold text-slate-800 text-sm">${t.judul}</h5>
+                            <span class="bg-red-100 text-red-800 text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap timer-element" data-target="${tutup}">Sisa Waktu...</span>
+                        </div>
+                        <div class="text-sm text-slate-600 leading-relaxed space-y-2">${formatTeksDanYouTube(t.isi)}</div>
+                        ${t.fileData ? `<a href="${t.fileData}" download="${t.fileName}" class="inline-block mt-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-download mr-1"></i> Unduh Soal Tugas</a>` : ''}
+                        
+                        <div class="mt-4 pt-4 border-t space-y-3 bg-indigo-50/50 p-3 rounded-xl border-indigo-100">
+                            <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> 1. Unggah Tugas ke Google Drive Guru:</p>
+                            ${driveLink ? `
+                                <a href="${driveLink}" target="_blank" class="flex items-center justify-center space-x-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow">
+                                    <span>Buka Tautan Google Drive Guru</span> <i class="fa-solid fa-external-link-alt"></i>
+                                </a>
+                            ` : `<p class="text-[11px] text-red-600 italic">Guru belum menyertakan link Google Drive.</p>`}
+
+                            <div class="mt-3 pt-3 border-t space-y-2">
+                                <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-check-double mr-1"></i> 2. Konfirmasi Penyelesaian:</p>
+                                ${sudahKirim ? `
+                                    <div class="bg-green-50 text-green-700 p-2 rounded-lg text-xs font-bold border border-green-200 flex items-center"><i class="fa-solid fa-check-circle mr-2"></i> Sudah Dikonfirmasi (${sudahKirim.waktu})</div>
+                                ` : `
+                                    <input type="text" id="konfirmasi-${t.id}" placeholder="Ketik nama file yang diunggah..." class="w-full px-3 py-2 text-xs rounded-lg border bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                                    <button onclick="kirimKonfirmasiTugas('${t.id}', '${t.judul.replace(/'/g, "")}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded-lg font-bold transition shadow">Kirim Konfirmasi ke Guru</button>
+                                `}
+                            </div>
+                        </div>
+                    </div>`;
+                }
             }).join('') : '<p class="text-sm text-slate-400 italic">Belum ada tugas.</p>';
+
+            // Mulai Timer Mundur Otomatis
+            startRealTimeTimers(mapel, kelas);
         }
 
-        window.kirimTugasSelesai = async function(tugasId, judulTugas) {
-            const input = document.getElementById(`jawaban-${tugasId}`);
-            const jawabanVal = input.value.trim();
-            if(!jawabanVal) return alert("Mohon tuliskan jawaban atau catatan tugas terlebih dahulu!");
-            if(!currentSiswaSession) return alert("Sesi siswa tidak ditemukan. Silakan isi absen ulang.");
+        function startRealTimeTimers(mapel, kelas) {
+            countdownTimerInterval = setInterval(() => {
+                const now = Date.now();
+                let needsRefresh = false;
+
+                document.querySelectorAll('.timer-element').forEach(el => {
+                    const target = parseInt(el.getAttribute('data-target'));
+                    const diff = target - now;
+
+                    if (diff <= 0) {
+                        el.innerText = "Waktu Habis!";
+                        needsRefresh = true; // Refresh layar agar materi yang tadinya terbuka jadi otomatis tertutup
+                    } else {
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+                        
+                        let text = "";
+                        if(d > 0) text += `${d}h `;
+                        text += `${h}j ${m}m ${s}d`;
+                        el.innerHTML = `<i class="fa-regular fa-clock"></i> ${text}`;
+                    }
+                });
+
+                if(needsRefresh && currentSiswaSession) {
+                    loadRuangBelajarSiswa(mapel, kelas); // Re-render otomatis jika ada status yang berubah
+                }
+            }, 1000);
+        }
+
+        window.kirimKonfirmasiTugas = async function(tugasId, judulTugas) {
+            const input = document.getElementById(`konfirmasi-${tugasId}`);
+            const jawabanVal = input.value.trim() || 'Tugas sudah diunggah.';
+            if(!currentSiswaSession) return;
 
             const newJawaban = {
                 tugasId, judulTugas,
@@ -745,10 +986,10 @@
             try {
                 await addDoc(collection(db, "jawaban"), newJawaban);
                 await fetchAllDataFromCloud();
-                alert("Tugas berhasil dikirim ke folder guru!");
+                alert("Konfirmasi tugas berhasil dikirim ke guru!");
                 loadRuangBelajarSiswa(currentSiswaSession.mapel, currentSiswaSession.kelas);
             } catch(err) {
-                alert("Gagal mengirim tugas: " + err.message);
+                alert("Gagal mengirim konfirmasi: " + err.message);
             }
         }
 
@@ -756,9 +997,11 @@
         window.loginGuru = function(e) {
             e.preventDefault();
             const nama = document.getElementById('g-nama-login').value;
+            const nip = document.getElementById('g-nip-login').value;
             const mapel = document.getElementById('g-mapel-login').value;
+            const drive = document.getElementById('g-drive-login').value;
 
-            currentGuru = { nama, mapel };
+            currentGuru = { nama, nip, mapel, drive };
             localStorage.setItem('smpn2_current_guru', JSON.stringify(currentGuru));
             activateGuruDashboard();
         }
@@ -766,8 +1009,9 @@
         function activateGuruDashboard() {
             document.getElementById('guru-login-box').classList.add('hidden');
             document.getElementById('guru-dashboard').classList.remove('hidden');
-            document.getElementById('label-guru-nama').innerText = currentGuru.nama;
+            document.getElementById('label-guru-nama').innerText = `${currentGuru.nama} (NIP: ${currentGuru.nip})`;
             document.getElementById('badge-guru-info').innerText = `Guru Mapel: ${currentGuru.mapel}`;
+            document.getElementById('label-guru-drive').innerHTML = `<i class="fa-brands fa-google-drive mr-1"></i> Tautan Drive: <a href="${currentGuru.drive}" target="_blank" class="underline text-blue-700">Tersimpan di Cloud</a>`;
             document.getElementById('gm-mapel').value = currentGuru.mapel;
             document.getElementById('gt-mapel').value = currentGuru.mapel;
             populateKelasDropdowns();
@@ -798,7 +1042,6 @@
             const tbody = document.getElementById('tabel-rekap-guru');
             if(!currentGuru) return;
             const filtered = dbAbsen.filter(a => a.mapel === currentGuru.mapel);
-
             tbody.innerHTML = filtered.length ? filtered.map(a => `
                 <tr class="border-b hover:bg-slate-50">
                     <td class="p-3 text-slate-500 text-xs">${a.waktu}</td>
@@ -807,14 +1050,13 @@
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${a.status==='Hadir'?'bg-green-100 text-green-700':a.status==='Sakit'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${a.status}</span></td>
                     <td class="p-3 text-slate-600">${a.catatan}</td>
                 </tr>
-            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data absensi untuk mapel ini.</td></tr>`;
+            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data absensi.</td></tr>`;
         }
 
         function renderJawabanGuru() {
             const tbody = document.getElementById('tabel-jawaban-guru');
             if(!currentGuru) return;
             const filtered = dbJawabanSiswa.filter(j => j.mapel === currentGuru.mapel);
-
             tbody.innerHTML = filtered.length ? filtered.map(j => `
                 <tr class="border-b hover:bg-slate-50 text-xs">
                     <td class="p-3 text-slate-500">${j.waktu}</td>
@@ -823,69 +1065,64 @@
                     <td class="p-3 font-semibold text-indigo-600">${j.judulTugas}</td>
                     <td class="p-3 text-slate-700 whitespace-pre-line">${j.jawaban}</td>
                 </tr>
-            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada tugas masuk dari siswa.</td></tr>`;
+            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada konfirmasi tugas.</td></tr>`;
         }
 
         function renderRiwayatGuru() {
             if(!currentGuru) return;
             
-            // Riwayat Materi
             const tbMateri = document.getElementById('tabel-riwayat-materi');
             const mFiltered = dbMateri.filter(m => m.mapel === currentGuru.mapel);
             tbMateri.innerHTML = mFiltered.length ? mFiltered.map(m => `
                 <tr class="border-b hover:bg-slate-50 text-xs">
+                    <td class="p-3 text-slate-600">
+                        <span class="block font-semibold text-green-700">Mulai: ${formatTanggalPendek(m.waktuBuka)}</span>
+                        <span class="block font-semibold text-red-700">Tutup: ${formatTanggalPendek(m.waktuTutup)}</span>
+                    </td>
                     <td class="p-3 font-bold text-slate-800">${m.judul}</td>
                     <td class="p-3">${m.kelas.join(', ')}</td>
-                    <td class="p-3 text-slate-600 truncate max-w-xs">${m.isi}</td>
                     <td class="p-3 text-center">
                         <button onclick="hapusMateri('${m.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 rounded font-bold">Hapus</button>
                     </td>
                 </tr>
-            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada riwayat materi.</td></tr>`;
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada materi dipublikasikan.</td></tr>`;
 
-            // Riwayat Tugas
             const tbTugas = document.getElementById('tabel-riwayat-tugas');
             const tFiltered = dbTugas.filter(t => t.mapel === currentGuru.mapel);
             tbTugas.innerHTML = tFiltered.length ? tFiltered.map(t => `
                 <tr class="border-b hover:bg-slate-50 text-xs">
+                    <td class="p-3 text-slate-600">
+                        <span class="block font-semibold text-green-700">Mulai: ${formatTanggalPendek(t.waktuBuka)}</span>
+                        <span class="block font-semibold text-red-700">Tutup: ${formatTanggalPendek(t.waktuTutup)}</span>
+                    </td>
                     <td class="p-3 font-bold text-slate-800">${t.judul}</td>
                     <td class="p-3">${t.kelas.join(', ')}</td>
-                    <td class="p-3 text-slate-600 truncate max-w-xs">${t.isi}</td>
                     <td class="p-3 text-center">
                         <button onclick="hapusTugas('${t.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 rounded font-bold">Hapus</button>
                     </td>
                 </tr>
-            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada riwayat tugas.</td></tr>`;
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada tugas dipublikasikan.</td></tr>`;
         }
 
         window.hapusMateri = async function(id) {
-            if(confirm("Yakin ingin menghapus materi ini?")) {
-                try {
-                    await deleteDoc(doc(db, "materi", id));
-                    await fetchAllDataFromCloud();
-                    alert("Materi berhasil dihapus.");
-                } catch(err) {
-                    alert("Gagal menghapus: " + err.message);
-                }
+            if(confirm("Hapus materi ini?")) {
+                try { await deleteDoc(doc(db, "materi", id)); await fetchAllDataFromCloud(); } catch(e) { alert(e.message); }
             }
         }
-
         window.hapusTugas = async function(id) {
-            if(confirm("Yakin ingin menghapus tugas ini?")) {
-                try {
-                    await deleteDoc(doc(db, "tugas", id));
-                    await fetchAllDataFromCloud();
-                    alert("Tugas berhasil dihapus.");
-                } catch(err) {
-                    alert("Gagal menghapus: " + err.message);
-                }
+            if(confirm("Hapus tugas ini?")) {
+                try { await deleteDoc(doc(db, "tugas", id)); await fetchAllDataFromCloud(); } catch(e) { alert(e.message); }
             }
         }
 
         window.publishMateri = async function(e) {
             e.preventDefault();
             const checkedKelas = Array.from(document.querySelectorAll('input[name="target_kelas_materi"]:checked')).map(el => el.value);
-            if(checkedKelas.length === 0) return alert("Pilih minimal satu target kelas!");
+            if(checkedKelas.length === 0) return alert("Pilih minimal satu kelas!");
+
+            const wBuka = new Date(document.getElementById('gm-buka').value).getTime();
+            const wTutup = new Date(document.getElementById('gm-tutup').value).getTime();
+            if(wTutup <= wBuka) return alert("Waktu tutup harus lebih besar (lebih lama) dari waktu buka!");
 
             const judul = document.getElementById('gm-judul').value;
             const isi = document.getElementById('gm-isi').value;
@@ -893,31 +1130,28 @@
 
             const executeUpload = async (fileData = null, fileName = null) => {
                 const newMateri = {
-                    mapel: currentGuru.mapel, kelas: checkedKelas, judul, isi, fileName, fileData, timestamp: Date.now()
+                    mapel: currentGuru.mapel, kelas: checkedKelas, judul, isi, fileName, fileData,
+                    waktuBuka: wBuka, waktuTutup: wTutup, timestamp: Date.now()
                 };
                 await addDoc(collection(db, "materi"), newMateri);
-                await fetchAllDataFromCloud();
-                alert("Materi berhasil dipublikasikan ke Cloud!");
-                e.target.reset();
-                document.getElementById('gm-mapel').value = currentGuru.mapel;
-                populateKelasDropdowns();
+                await fetchAllDataFromCloud(); alert("Materi Terjadwal berhasil disimpan ke Cloud!");
+                e.target.reset(); document.getElementById('gm-mapel').value = currentGuru.mapel; populateKelasDropdowns();
             };
 
             if(fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = async function(uploadEvent) {
-                    await executeUpload(uploadEvent.target.result, fileInput.files[0].name);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                await executeUpload();
-            }
+                const r = new FileReader(); r.onload = async function(ev) { await executeUpload(ev.target.result, fileInput.files[0].name); };
+                r.readAsDataURL(fileInput.files[0]);
+            } else { await executeUpload(); }
         }
 
         window.publishTugas = async function(e) {
             e.preventDefault();
             const checkedKelas = Array.from(document.querySelectorAll('input[name="target_kelas_tugas"]:checked')).map(el => el.value);
-            if(checkedKelas.length === 0) return alert("Pilih minimal satu target kelas!");
+            if(checkedKelas.length === 0) return alert("Pilih minimal satu kelas!");
+
+            const wBuka = new Date(document.getElementById('gt-buka').value).getTime();
+            const wTutup = new Date(document.getElementById('gt-tutup').value).getTime();
+            if(wTutup <= wBuka) return alert("Waktu tutup harus lebih besar (lebih lama) dari waktu buka!");
 
             const judul = document.getElementById('gt-judul').value;
             const isi = document.getElementById('gt-isi').value;
@@ -925,34 +1159,26 @@
 
             const executeUpload = async (fileData = null, fileName = null) => {
                 const newTugas = {
-                    mapel: currentGuru.mapel, kelas: checkedKelas, judul, isi, fileName, fileData, timestamp: Date.now()
+                    mapel: currentGuru.mapel, kelas: checkedKelas, judul, isi, fileName, fileData, 
+                    driveLink: currentGuru.drive || '#', // LINK DRIVE TERSIMPAN DI CLOUD
+                    waktuBuka: wBuka, waktuTutup: wTutup, timestamp: Date.now()
                 };
                 await addDoc(collection(db, "tugas"), newTugas);
-                await fetchAllDataFromCloud();
-                alert("Tugas berhasil dipublikasikan ke Cloud!");
-                e.target.reset();
-                document.getElementById('gt-mapel').value = currentGuru.mapel;
-                populateKelasDropdowns();
+                await fetchAllDataFromCloud(); alert("Tugas Terjadwal berhasil disimpan ke Cloud!");
+                e.target.reset(); document.getElementById('gt-mapel').value = currentGuru.mapel; populateKelasDropdowns();
             };
 
             if(fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = async function(uploadEvent) {
-                    await executeUpload(uploadEvent.target.result, fileInput.files[0].name);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                await executeUpload();
-            }
+                const r = new FileReader(); r.onload = async function(ev) { await executeUpload(ev.target.result, fileInput.files[0].name); };
+                r.readAsDataURL(fileInput.files[0]);
+            } else { await executeUpload(); }
         }
 
         window.exportToCSV = function() {
             if(!currentGuru) return;
             const filtered = dbAbsen.filter(a => a.mapel === currentGuru.mapel);
             let csv = "Waktu,Nama Siswa,Kelas,Mapel,Status,Catatan\n";
-            filtered.forEach(a => {
-                csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`;
-            });
+            filtered.forEach(a => { csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`; });
             downloadCSVFile(csv, `Rekap_Absen_${currentGuru.mapel}.csv`);
         }
 
@@ -961,201 +1187,167 @@
             e.preventDefault();
             const u = document.getElementById('adm-user').value;
             const p = document.getElementById('adm-pass').value;
-
-            if(u === 'admin' && p === 'admin') {
-                isAdminLoggedIn = true;
-                localStorage.setItem('smpn2_admin_logged', 'true');
-                activateAdminDashboard();
-            } else {
-                alert("Username atau Password salah!");
-            }
+            if(u === 'admin' && p === 'admin') { isAdminLoggedIn = true; localStorage.setItem('smpn2_admin_logged', 'true'); activateAdminDashboard(); } else { alert("Login Salah!"); }
         }
 
         function activateAdminDashboard() {
             document.getElementById('admin-login-box').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
-            renderRekapAdmin();
-            renderRekapPerKelas();
-            renderSiswaDBTable();
+            renderRekapAdmin(); renderRekapPerKelas(); renderSiswaDBTable(); renderAdminDasborMateriTugas();
         }
 
         window.logoutAdmin = function() {
-            isAdminLoggedIn = false;
-            localStorage.removeItem('smpn2_admin_logged');
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('admin-login-box').classList.remove('hidden');
+            isAdminLoggedIn = false; localStorage.removeItem('smpn2_admin_logged');
+            document.getElementById('admin-dashboard').classList.add('hidden'); document.getElementById('admin-login-box').classList.remove('hidden');
         }
 
         window.switchTabAdmin = function(tab) {
-            ['rekap', 'perkelas', 'siswa'].forEach(t => {
+            ['rekap', 'perkelas', 'materi', 'siswa'].forEach(t => {
                 document.getElementById(`acontent-${t}`).classList.add('hidden');
                 document.getElementById(`atab-${t}`).className = "px-4 py-2 font-semibold text-slate-500 hover:text-slate-700 text-sm whitespace-nowrap";
             });
             document.getElementById(`acontent-${tab}`).classList.remove('hidden');
             document.getElementById(`atab-${tab}`).className = "px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600 text-sm whitespace-nowrap";
             if(tab === 'perkelas') renderRekapPerKelas();
+            if(tab === 'materi') renderAdminDasborMateriTugas();
         }
 
         function renderRekapAdmin() {
             const tbody = document.getElementById('tabel-rekap-admin');
             tbody.innerHTML = dbAbsen.length ? dbAbsen.map((a, idx) => `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="p-3 text-slate-500 text-xs">${a.waktu}</td>
+                    <td class="p-3 text-slate-500 text-xs whitespace-nowrap">${a.waktu}</td>
                     <td class="p-3 font-medium text-slate-800">${a.nama}</td>
-                    <td class="p-3">${a.kelas}</td>
-                    <td class="p-3">${a.mapel}</td>
+                    <td class="p-3 whitespace-nowrap">${a.kelas}</td>
+                    <td class="p-3 font-semibold text-blue-700 whitespace-nowrap">${a.mapel}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${a.status==='Hadir'?'bg-green-100 text-green-700':a.status==='Sakit'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${a.status}</span></td>
                     <td class="p-3 text-slate-600">${a.catatan}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="hapusAbsen('${a.id}')" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 bg-red-50 rounded">Hapus</button>
-                    </td>
+                    <td class="p-3 text-center"><button onclick="hapusAbsen('${a.id}')" class="text-red-500 hover:text-red-700 text-xs font-bold px-2 py-1 bg-red-50 rounded">Hapus</button></td>
                 </tr>
-            `).join('') : `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada data absensi keseluruhan.</td></tr>`;
-        }
-
-        function getFilteredAbsenPerKelas() {
-            const kelasVal = document.getElementById('filter-rekap-kelas').value;
-            const periodeVal = document.getElementById('filter-rekap-periode').value;
-
-            const todayStr = new Date().toISOString().split('T')[0];
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            const sub = document.getElementById('print-subtitle');
-            if(sub) sub.innerText = `Kelas: ${kelasVal} | Periode: ${periodeVal.toUpperCase()}`;
-
-            return dbAbsen.filter(a => {
-                if(a.kelas !== kelasVal) return false;
-                if(periodeVal === 'hari') return a.rawDate === todayStr;
-                else if(periodeVal === 'minggu') {
-                    if(!a.rawDate) return true;
-                    return new Date(a.rawDate) >= sevenDaysAgo;
-                }
-                return true;
-            });
+            `).join('') : `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada absen.</td></tr>`;
         }
 
         window.renderRekapPerKelas = function() {
-            const tbody = document.getElementById('tabel-rekap-perkelas');
-            const filtered = getFilteredAbsenPerKelas();
+            const k = document.getElementById('filter-rekap-kelas').value;
+            const m = document.getElementById('filter-rekap-mapel').value;
+            const p = document.getElementById('filter-rekap-periode').value;
+            const sub = document.getElementById('print-subtitle');
+            if(sub) sub.innerText = `Kelas: ${k} | Mapel: ${m || 'Semua'} | Periode: ${p.toUpperCase()}`;
 
+            const today = new Date().toISOString().split('T')[0];
+            const t7 = new Date(); t7.setDate(t7.getDate() - 7);
+
+            const filtered = dbAbsen.filter(a => {
+                if(k && a.kelas !== k) return false;
+                if(m && a.mapel !== m) return false;
+                if(p === 'hari') return a.rawDate === today;
+                if(p === 'minggu') return new Date(a.rawDate) >= t7;
+                return true;
+            });
+
+            const tbody = document.getElementById('tabel-rekap-perkelas');
             tbody.innerHTML = filtered.length ? filtered.map(a => `
                 <tr class="border-b hover:bg-slate-50">
-                    <td class="p-3 text-slate-500 text-xs">${a.waktu}</td>
+                    <td class="p-3 text-slate-500 text-xs whitespace-nowrap">${a.waktu}</td>
                     <td class="p-3 font-medium text-slate-800">${a.nama}</td>
-                    <td class="p-3 font-semibold text-blue-700">${a.mapel}</td>
+                    <td class="p-3 font-semibold text-blue-700 whitespace-nowrap">${a.mapel}</td>
+                    <td class="p-3 whitespace-nowrap">${a.kelas}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${a.status==='Hadir'?'bg-green-100 text-green-700':a.status==='Sakit'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${a.status}</span></td>
                     <td class="p-3 text-slate-600">${a.catatan}</td>
                 </tr>
-            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Tidak ada data absensi untuk filter kelas dan periode ini.</td></tr>`;
+            `).join('') : `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Tidak ada data absensi.</td></tr>`;
+        }
+
+        window.renderAdminDasborMateriTugas = function() {
+            const tbMat = document.getElementById('admin-tabel-materi');
+            tbMat.innerHTML = dbMateri.length ? dbMateri.map(m => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-3 font-semibold text-blue-700 whitespace-nowrap">${m.mapel}</td>
+                    <td class="p-3 font-bold text-slate-800">${m.judul}<br><span class="text-[10px] text-slate-500 font-normal">Tutup: ${formatTanggalPendek(m.waktuTutup)}</span></td>
+                    <td class="p-3">${m.kelas.join(', ')}</td>
+                    <td class="p-3 text-slate-600 truncate max-w-xs">${m.isi}</td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada materi.</td></tr>`;
+
+            const tbTug = document.getElementById('admin-tabel-tugas');
+            tbTug.innerHTML = dbTugas.length ? dbTugas.map(t => `
+                <tr class="border-b hover:bg-slate-50">
+                    <td class="p-3 font-semibold text-indigo-700 whitespace-nowrap">${t.mapel}</td>
+                    <td class="p-3 font-bold text-slate-800">${t.judul}<br><span class="text-[10px] text-slate-500 font-normal">Tutup: ${formatTanggalPendek(t.waktuTutup)}</span></td>
+                    <td class="p-3">${t.kelas.join(', ')}</td>
+                    <td class="p-3 text-slate-600 truncate max-w-xs">${t.isi}</td>
+                </tr>
+            `).join('') : `<tr><td colspan="4" class="p-3 text-center text-slate-400 italic">Belum ada tugas.</td></tr>`;
         }
 
         window.exportRekapPerKelas = function() {
-            const kelasVal = document.getElementById('filter-rekap-kelas').value;
+            const kelasVal = document.getElementById('filter-rekap-kelas').value || "SemuaKelas";
+            const mapelVal = document.getElementById('filter-rekap-mapel').value || "SemuaMapel";
             const periodeVal = document.getElementById('filter-rekap-periode').value;
-            const filtered = getFilteredAbsenPerKelas();
+            
+            const k = document.getElementById('filter-rekap-kelas').value;
+            const m = document.getElementById('filter-rekap-mapel').value;
+            const p = document.getElementById('filter-rekap-periode').value;
+            const today = new Date().toISOString().split('T')[0];
+            const t7 = new Date(); t7.setDate(t7.getDate() - 7);
 
-            let csv = `Waktu,Nama Siswa,Kelas,Mata Pelajaran,Status,Catatan\n`;
-            filtered.forEach(a => {
-                csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`;
+            const filtered = dbAbsen.filter(a => {
+                if(k && a.kelas !== k) return false;
+                if(m && a.mapel !== m) return false;
+                if(p === 'hari') return a.rawDate === today;
+                if(p === 'minggu') return new Date(a.rawDate) >= t7;
+                return true;
             });
-            downloadCSVFile(csv, `Rekap_Absen_Kelas_${kelasVal}_(${periodeVal}).csv`);
+
+            let csv = `Waktu,Nama Siswa,Mata Pelajaran,Kelas,Status,Catatan\n`;
+            filtered.forEach(a => { csv += `"${a.waktu}","${a.nama}","${a.mapel}","${a.kelas}","${a.status}","${a.catatan}"\n`; });
+            downloadCSVFile(csv, `Rekap_Absen_${kelasVal}_${mapelVal}_(${periodeVal}).csv`);
         }
 
-        window.hapusAbsen = async function(id) {
-            if(confirm("Yakin ingin menghapus data absen ini dari cloud?")) {
-                try {
-                    await deleteDoc(doc(db, "absen", id));
-                    await fetchAllDataFromCloud();
-                } catch(err) {
-                    alert("Gagal menghapus: " + err.message);
-                }
-            }
-        }
-
+        window.hapusAbsen = async function(id) { if(confirm("Hapus data absen?")) { await deleteDoc(doc(db, "absen", id)); await fetchAllDataFromCloud(); } }
+        
         window.exportToCSVAdmin = function() {
             let csv = "Waktu,Nama Siswa,Kelas,Mapel,Status,Catatan\n";
-            dbAbsen.forEach(a => {
-                csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`;
-            });
-            downloadCSVFile(csv, "Rekap_Absen_Keseluruhan_SMPN2.csv");
+            dbAbsen.forEach(a => { csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`; });
+            downloadCSVFile(csv, "Rekap_Absen_Semua.csv");
         }
 
-        window.downloadTemplateCSV = function() {
-            let csv = "Nama Siswa,Kelas\nAhmad Fauzi,7-A\nSiti Aminah,7-A\nBudi Santoso,8-B\n";
-            downloadCSVFile(csv, "Template_Daftar_Siswa_SMPN2.csv");
-        }
+        window.downloadTemplateCSV = function() { downloadCSVFile("Nama Siswa,Kelas\nAhmad Fauzi,7-A\nSiti Aminah,7-A\n", "Template_Siswa.csv"); }
 
         window.prosesUploadCSV = function() {
-            const fileInput = document.getElementById('csv-file-input');
-            if(!fileInput.files[0]) return alert("Pilih file CSV terlebih dahulu!");
-
+            const fi = document.getElementById('csv-file-input'); if(!fi.files[0]) return alert("Pilih CSV!");
             const reader = new FileReader();
             reader.onload = async function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n');
-                let count = 0;
-
-                for(let idx = 0; idx < rows.length; idx++) {
-                    if(idx === 0) continue;
-                    const rowLine = rows[idx].trim();
-                    if(!rowLine) continue;
-
-                    const cols = rowLine.split(',');
+                const rows = e.target.result.split('\n'); let c = 0;
+                for(let i = 1; i < rows.length; i++) {
+                    const line = rows[i].trim(); if(!line) continue;
+                    const cols = line.split(',');
                     if(cols.length >= 2) {
-                        const nama = cols[0].trim().replace(/"/g, '');
-                        const kelas = cols[1].trim().replace(/"/g, '');
-                        if(nama && kelas) {
-                            await addDoc(collection(db, "siswa"), { nama, kelas });
-                            count++;
-                        }
+                        const nama = cols[0].trim().replace(/"/g, ''); const kelas = cols[1].trim().replace(/"/g, '');
+                        if(nama && kelas) { await addDoc(collection(db, "siswa"), {nama, kelas}); c++; }
                     }
                 }
-
-                await fetchAllDataFromCloud();
-                alert(`Berhasil mengunggah ${count} data siswa ke Cloud!`);
-                fileInput.value = "";
+                await fetchAllDataFromCloud(); alert(`${c} siswa berhasil diunggah!`); fi.value = "";
             };
-            reader.readAsText(fileInput.files[0]);
+            reader.readAsText(fi.files[0]);
         }
 
         function renderSiswaDBTable() {
-            const tbody = document.getElementById('tabel-db-siswa');
-            const countElem = document.getElementById('count-siswa-db');
-            if(countElem) countElem.innerText = dbSiswa.length;
-            if(tbody) {
-                tbody.innerHTML = dbSiswa.length ? dbSiswa.map(s => `
-                    <tr class="border-b">
-                        <td class="p-2 font-medium text-slate-800">${s.nama}</td>
-                        <td class="p-2 text-slate-600">${s.kelas}</td>
-                    </tr>
-                `).join('') : `<tr><td colspan="2" class="p-3 text-center text-slate-400 italic">Belum ada data siswa di cloud.</td></tr>`;
-            }
+            const tb = document.getElementById('tabel-db-siswa');
+            document.getElementById('count-siswa-db').innerText = dbSiswa.length;
+            tb.innerHTML = dbSiswa.length ? dbSiswa.map(s => `<tr class="border-b"><td class="p-2 font-medium">${s.nama}</td><td class="p-2 text-slate-600">${s.kelas}</td></tr>`).join('') : `<tr><td colspan="2" class="p-3 text-center text-slate-400 italic">Belum ada siswa.</td></tr>`;
         }
 
         window.clearSiswaDB = async function() {
-            if(confirm("Yakin ingin menghapus seluruh database siswa di cloud?")) {
-                try {
-                    const snap = await getDocs(collection(db, "siswa"));
-                    for(const d of snap.docs) {
-                        await deleteDoc(doc(db, "siswa", d.id));
-                    }
-                    await fetchAllDataFromCloud();
-                    alert("Database siswa berhasil dikosongkan.");
-                } catch(err) {
-                    alert("Gagal menghapus: " + err.message);
-                }
+            if(confirm("Hapus seluruh database siswa?")) {
+                const s = await getDocs(collection(db, "siswa"));
+                for(const d of s.docs) await deleteDoc(doc(db, "siswa", d.id));
+                await fetchAllDataFromCloud(); alert("Dikosongkan.");
             }
         }
 
-        function downloadCSVFile(csvContent, filename) {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            a.click();
-            URL.revokeObjectURL(url);
+        function downloadCSVFile(csv, name) {
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'})); a.download = name; a.click();
         }
     </script>
 </body>
