@@ -283,7 +283,6 @@
                                     <label class="block text-sm font-semibold text-amber-900 mb-1"><i class="fa-regular fa-calendar-xmark mr-1"></i> Jadwal Tutup Akses</label>
                                     <input type="datetime-local" id="gm-tutup" required class="w-full px-4 py-2 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500">
                                 </div>
-                                <p class="col-span-1 md:col-span-2 text-xs text-amber-700 italic">Siswa akan melihat Timer (Hitung Mundur) saat materi/tugas sedang berlangsung.</p>
                             </div>
 
                             <div>
@@ -844,7 +843,7 @@
             document.getElementById('s-nama').innerHTML = '<option value="">-- Pilih kelas terlebih dahulu --</option>';
         }
 
-        // FUNGSI RENDER RUANG BELAJAR DENGAN LOGIKA WAKTU
+        // FUNGSI RENDER RUANG BELAJAR DENGAN OPSI UPLOAD TUGAS LENGKAP (FOTO LANGSUNG / FILE)
         window.loadRuangBelajarSiswa = function(mapel, kelas) {
             if(countdownTimerInterval) clearInterval(countdownTimerInterval);
 
@@ -858,7 +857,7 @@
             // RENDER MATERI
             listMateri.innerHTML = mFiltered.length ? mFiltered.map(m => {
                 const buka = m.waktuBuka || 0; 
-                const tutup = m.waktuTutup || 4102444800000; // default aman (thn 2100)
+                const tutup = m.waktuTutup || 4102444800000;
 
                 if (now < buka) {
                     return `<div class="p-4 bg-slate-50 rounded-xl border border-slate-200 opacity-80">
@@ -883,7 +882,7 @@
                 }
             }).join('') : '<p class="text-sm text-slate-400 italic">Belum ada materi untuk Anda.</p>';
 
-            // RENDER TUGAS
+            // RENDER TUGAS DENGAN PILIHAN OPSI UPLOAD (KAMERA & FILE)
             listTugas.innerHTML = tFiltered.length ? tFiltered.map(t => {
                 const buka = t.waktuBuka || 0; 
                 const tutup = t.waktuTutup || 4102444800000;
@@ -912,19 +911,43 @@
                         ${t.fileData ? `<a href="${t.fileData}" download="${t.fileName}" class="inline-block mt-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-download mr-1"></i> Unduh Soal Tugas</a>` : ''}
                         
                         <div class="mt-4 pt-4 border-t space-y-3 bg-indigo-50/50 p-3 rounded-xl border-indigo-100">
-                            <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> 1. Unggah Tugas ke Google Drive Guru:</p>
-                            ${driveLink ? `
-                                <a href="${driveLink}" target="_blank" class="flex items-center justify-center space-x-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow">
-                                    <span>Buka Tautan Google Drive Guru</span> <i class="fa-solid fa-external-link-alt"></i>
-                                </a>
-                            ` : `<p class="text-[11px] text-red-600 italic">Guru belum menyertakan link Google Drive.</p>`}
+                            <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Cara Mengirim Tugas ke Guru:</p>
+                            
+                            <!-- PILIHAN AKSES GOOGLE DRIVE (PILIHAN 1 & 2) -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                ${driveLink ? `
+                                    <a href="${driveLink}" target="_blank" class="flex items-center justify-center space-x-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition shadow text-center">
+                                        <i class="fa-brands fa-google-drive text-sm"></i>
+                                        <span>Buka Drive Guru</span>
+                                        <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                                    </a>
+                                ` : `<div class="text-[11px] text-red-600 italic bg-white p-2 rounded border">Drive belum diset guru</div>`}
+
+                                <!-- Pilihan Pintasan Kamera / Foto Langsung atau Pilih File Dokumen -->
+                                <div class="flex gap-1">
+                                    <label class="flex-1 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded-xl text-[11px] cursor-pointer transition shadow text-center">
+                                        <i class="fa-solid fa-camera mb-0.5"></i>
+                                        <span>Foto Langsung</span>
+                                        <input type="file" accept="image/*" capture="environment" onchange="pilihFileTugas(this, '${t.id}')" class="hidden">
+                                    </label>
+                                    
+                                    <label class="flex-1 flex flex-col items-center justify-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-2 rounded-xl text-[11px] cursor-pointer transition shadow text-center">
+                                        <i class="fa-solid fa-folder-open mb-0.5"></i>
+                                        <span>Pilih File/Doc</span>
+                                        <input type="file" accept=".pdf,image/*,.doc,.docx" onchange="pilihFileTugas(this, '${t.id}')" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 italic">*Pilih <b>"Foto Langsung"</b> untuk memotret lembar jawaban dengan kamera HP, atau <b>"Pilih File/Doc"</b> untuk mengambil dari galeri/penyimpanan, lalu unggah ke Drive Guru.</p>
 
                             <div class="mt-3 pt-3 border-t space-y-2">
-                                <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-check-double mr-1"></i> 2. Konfirmasi Penyelesaian:</p>
+                                <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-check-double mr-1"></i> 3. Konfirmasi Penyelesaian Tugas:</p>
                                 ${sudahKirim ? `
-                                    <div class="bg-green-50 text-green-700 p-2 rounded-lg text-xs font-bold border border-green-200 flex items-center"><i class="fa-solid fa-check-circle mr-2"></i> Sudah Dikonfirmasi (${sudahKirim.waktu})</div>
+                                    <div class="bg-green-50 text-green-700 p-2 rounded-lg text-xs font-bold border border-green-200 flex items-center justify-between">
+                                        <span><i class="fa-solid fa-check-circle mr-1"></i> Terkirim: ${sudahKirim.jawaban}</span>
+                                    </div>
                                 ` : `
-                                    <input type="text" id="konfirmasi-${t.id}" placeholder="Ketik nama file yang diunggah..." class="w-full px-3 py-2 text-xs rounded-lg border bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
+                                    <input type="text" id="konfirmasi-${t.id}" placeholder="Nama file yang diunggah / Catatan selesai..." class="w-full px-3 py-2 text-xs rounded-lg border bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
                                     <button onclick="kirimKonfirmasiTugas('${t.id}', '${t.judul.replace(/'/g, "")}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded-lg font-bold transition shadow">Kirim Konfirmasi ke Guru</button>
                                 `}
                             </div>
@@ -933,8 +956,19 @@
                 }
             }).join('') : '<p class="text-sm text-slate-400 italic">Belum ada tugas.</p>';
 
-            // Mulai Timer Mundur Otomatis
             startRealTimeTimers(mapel, kelas);
+        }
+
+        // Fungsi Pintasan Otomatis Saat Siswa Memilih File atau Memotret Kamera
+        window.pilihFileTugas = function(inputElement, tugasId) {
+            if(inputElement.files && inputElement.files[0]) {
+                const fileName = inputElement.files[0].name;
+                const konfirmasiInput = document.getElementById(`konfirmasi-${tugasId}`);
+                if(konfirmasiInput) {
+                    konfirmasiInput.value = `File terpilih: ${fileName}`;
+                }
+                alert(`File "${fileName}" berhasil dipilih! Silakan klik tombol "Buka Drive Guru" untuk mengunggahnya, lalu klik "Kirim Konfirmasi ke Guru".`);
+            }
         }
 
         function startRealTimeTimers(mapel, kelas) {
@@ -948,7 +982,7 @@
 
                     if (diff <= 0) {
                         el.innerText = "Waktu Habis!";
-                        needsRefresh = true; // Refresh layar agar materi yang tadinya terbuka jadi otomatis tertutup
+                        needsRefresh = true;
                     } else {
                         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -963,7 +997,7 @@
                 });
 
                 if(needsRefresh && currentSiswaSession) {
-                    loadRuangBelajarSiswa(mapel, kelas); // Re-render otomatis jika ada status yang berubah
+                    loadRuangBelajarSiswa(mapel, kelas);
                 }
             }, 1000);
         }
@@ -1160,7 +1194,7 @@
             const executeUpload = async (fileData = null, fileName = null) => {
                 const newTugas = {
                     mapel: currentGuru.mapel, kelas: checkedKelas, judul, isi, fileName, fileData, 
-                    driveLink: currentGuru.drive || '#', // LINK DRIVE TERSIMPAN DI CLOUD
+                    driveLink: currentGuru.drive || '#', 
                     waktuBuka: wBuka, waktuTutup: wTutup, timestamp: Date.now()
                 };
                 await addDoc(collection(db, "tugas"), newTugas);
