@@ -239,12 +239,19 @@
 
                 <div id="gcontent-rekap" class="space-y-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 overflow-x-auto">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-slate-800">Daftar Kehadiran Siswa</h4>
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-end gap-3 mb-4 no-print">
+                            <div>
+                                <h4 class="font-bold text-slate-800">Daftar Kehadiran Siswa</h4>
+                                <label for="filter-kelas-guru" class="block text-xs font-semibold text-slate-600 mt-3 mb-1">Filter kelas</label>
+                                <select id="filter-kelas-guru" onchange="renderRekapGuru()" class="px-3 py-2 rounded-lg border text-sm bg-white min-w-48 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Semua Kelas</option>
+                                </select>
+                            </div>
                             <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
-                                <i class="fa-solid fa-file-excel mr-1"></i> Unduh Rekap Excel
+                                <i class="fa-solid fa-file-excel mr-1"></i> Unduh Rekap Kelas (CSV/Excel)
                             </button>
                         </div>
+                        <p class="text-xs text-slate-500 mb-3 no-print"><span class="inline-block w-3 h-3 rounded-sm bg-red-200 border border-red-400 mr-1"></span> Merah = siswa sudah absen, tetapi belum ditemukan pengumpulan tugas pada kelas/mapel tersebut. Ini indikator berdasarkan data tugas, bukan bukti pasti siswa tidak membuka materi.</p>
                         <table class="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 border-b">
@@ -631,6 +638,28 @@
         &copy; 2026 SMPN 2 Cipongkor. Seluruh Hak Cipta Dilindungi.
     </footer>
 
+    <!-- Navigasi dasar dijalankan di script biasa agar tombol tetap bisa berpindah
+         bagian walaupun modul Firebase gagal dimuat atau internet lambat. -->
+    <script>
+        window.switchRole = function(role) {
+            const roles = ['siswa', 'guru', 'admin'];
+            if (!roles.includes(role)) return;
+            roles.forEach(function(r) {
+                const section = document.getElementById('section-' + r);
+                const nav = document.getElementById('nav-' + r);
+                if (section) section.classList.toggle('hidden', r !== role);
+                if (nav) {
+                    nav.className = r === role
+                        ? 'px-4 py-1.5 rounded-lg text-sm font-medium transition bg-blue-600 text-white shadow'
+                        : 'px-4 py-1.5 rounded-lg text-sm font-medium transition text-blue-200 hover:text-white';
+                }
+            });
+        };
+        document.addEventListener('DOMContentLoaded', function() {
+            window.switchRole('siswa');
+        });
+    </script>
+
     <!-- Firebase SDK & Controller -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -733,6 +762,14 @@
             if(selSiswa) {
                 selSiswa.innerHTML = '<option value="">-- Pilih Kelas --</option>';
                 listKelas.forEach(k => { selSiswa.innerHTML += `<option value="${k}">${k}</option>`; });
+            }
+
+            const filterKelasGuru = document.getElementById('filter-kelas-guru');
+            if(filterKelasGuru) {
+                const currentValue = filterKelasGuru.value;
+                filterKelasGuru.innerHTML = '<option value="">Semua Kelas</option>';
+                listKelas.forEach(k => { filterKelasGuru.innerHTML += `<option value="${k}">Kelas ${k}</option>`; });
+                filterKelasGuru.value = currentValue;
             }
 
             const filterKelasAdmin = document.getElementById('filter-rekap-kelas');
@@ -1100,19 +1137,59 @@
             if(tab === 'materi' || tab === 'tugas') renderRiwayatGuru();
         }
 
+        function tanggalAbsen(a) {
+            if (a.rawDate) return a.rawDate;
+            if (a.timestamp) return new Date(a.timestamp).toISOString().split('T')[0];
+            return '';
+        }
+
+        // Satu baris per siswa, kelas, mapel, dan tanggal; bila ada kiriman ganda, pakai data terbaru.
+        function rekapGuruUnik() {
+            if (!currentGuru) return [];
+            const kelasDipilih = document.getElementById('filter-kelas-guru')?.value || '';
+            const hasil = new Map();
+            dbAbsen.filter(a => a.mapel === currentGuru.mapel && (!kelasDipilih || a.kelas === kelasDipilih))
+                .forEach(a => {
+                    const key = `${tanggalAbsen(a)}|${String(a.kelas || '').trim().toLowerCase()}|${String(a.mapel || '').trim().toLowerCase()}|${String(a.nama || '').trim().toLowerCase()}`;
+                    const lama = hasil.get(key);
+                    if (!lama || Number(a.timestamp || 0) >= Number(lama.timestamp || 0)) hasil.set(key, a);
+                });
+            return Array.from(hasil.values()).sort((a,b) => Number(b.timestamp || 0) - Number(a.timestamp || 0));
+        }
+
+        function statusPartisipasiAbsen(a) {
+            if (a.status !== 'Hadir') return { label: a.status === 'Sakit' ? 'Sakit' : 'Izin', merah: false };
+            const waktuAbsen = Number(a.timestamp || Date.now());
+            const tugasRelevan = dbTugas.filter(t => {
+                if (t.mapel !== a.mapel || !Array.isArray(t.kelas) || !t.kelas.includes(a.kelas)) return false;
+                const buka = Number(t.waktuBuka || t.timestamp || 0);
+                const tutup = Number(t.waktuTutup || Number.MAX_SAFE_INTEGER);
+                return buka <= waktuAbsen && tutup >= waktuAbsen;
+            });
+            if (!tugasRelevan.length) return { label: 'Belum ada tugas aktif saat absen', merah: false };
+            const sudahKirim = dbJawabanSiswa.some(j =>
+                String(j.namaSiswa || '').trim().toLowerCase() === String(a.nama || '').trim().toLowerCase() &&
+                j.kelas === a.kelas && j.mapel === a.mapel &&
+                tugasRelevan.some(t => j.tugasId === t.id)
+            );
+            return sudahKirim ? { label: 'Ada tugas terkirim', merah: false } : { label: 'Absen saja / tugas belum terkirim', merah: true };
+        }
+
         function renderRekapGuru() {
             const tbody = document.getElementById('tabel-rekap-guru');
-            if(!currentGuru) return;
-            const filtered = dbAbsen.filter(a => a.mapel === currentGuru.mapel);
-            tbody.innerHTML = filtered.length ? filtered.map(a => `
-                <tr class="border-b hover:bg-slate-50">
-                    <td class="p-3 text-slate-500 text-xs">${a.waktu}</td>
-                    <td class="p-3 font-medium text-slate-800">${a.nama}</td>
-                    <td class="p-3">${a.kelas}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${a.status==='Hadir'?'bg-green-100 text-green-700':a.status==='Sakit'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${a.status}</span></td>
-                    <td class="p-3 text-slate-600">${a.catatan}</td>
-                </tr>
-            `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data absensi.</td></tr>`;
+            if(!currentGuru || !tbody) return;
+            const filtered = rekapGuruUnik();
+            tbody.innerHTML = filtered.length ? filtered.map(a => {
+                const partisipasi = statusPartisipasiAbsen(a);
+                return `
+                <tr class="border-b ${partisipasi.merah ? 'bg-red-50 text-red-800' : 'hover:bg-slate-50'}">
+                    <td class="p-3 ${partisipasi.merah ? 'text-red-700' : 'text-slate-500'} text-xs">${a.waktu || '-'}</td>
+                    <td class="p-3 font-medium ${partisipasi.merah ? 'text-red-800' : 'text-slate-800'}">${a.nama || '-'}</td>
+                    <td class="p-3">${a.kelas || '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${a.status==='Hadir'?'bg-green-100 text-green-700':a.status==='Sakit'?'bg-amber-100 text-amber-700':'bg-blue-100 text-blue-700'}">${a.status || '-'}</span></td>
+                    <td class="p-3 ${partisipasi.merah ? 'text-red-700 font-semibold' : 'text-slate-600'}">${a.catatan || '-'}<div class="mt-1 text-[11px] ${partisipasi.merah ? 'font-bold text-red-700' : 'text-slate-500'}">${partisipasi.label}</div></td>
+                </tr>`;
+            }).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada data absensi untuk filter ini.</td></tr>`;
         }
 
         function renderJawabanGuru() {
@@ -1238,10 +1315,15 @@
 
         window.exportToCSV = function() {
             if(!currentGuru) return;
-            const filtered = dbAbsen.filter(a => a.mapel === currentGuru.mapel);
-            let csv = "Waktu,Nama Siswa,Kelas,Mapel,Status,Catatan\n";
-            filtered.forEach(a => { csv += `"${a.waktu}","${a.nama}","${a.kelas}","${a.mapel}","${a.status}","${a.catatan}"\n`; });
-            downloadCSVFile(csv, `Rekap_Absen_${currentGuru.mapel}.csv`);
+            const filtered = rekapGuruUnik();
+            const csvSafe = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            let csv = "Waktu,Nama Siswa,Kelas,Mapel,Status,Catatan,Indikator Tugas\n";
+            filtered.forEach(a => {
+                const partisipasi = statusPartisipasiAbsen(a);
+                csv += [a.waktu, a.nama, a.kelas, a.mapel, a.status, a.catatan, partisipasi.label].map(csvSafe).join(',') + "\n";
+            });
+            const kelasDipilih = document.getElementById('filter-kelas-guru')?.value || 'Semua_Kelas';
+            downloadCSVFile('\ufeff' + csv, `Rekap_Absen_${kelasDipilih}_${currentGuru.mapel.replace(/[^a-z0-9_-]/gi, '_')}.csv`);
         }
 
         // --- ADMIN ---
@@ -1457,7 +1539,22 @@
         }
 
         function downloadCSVFile(csv, name) {
-            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'})); a.download = name; a.click();
+            try {
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name || 'Rekap_Absen.csv';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                // Beri waktu browser memulai unduhan sebelum URL dibersihkan.
+                window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+            } catch (err) {
+                console.error('Gagal mengunduh rekap:', err);
+                alert('Unduhan gagal. Coba gunakan Google Chrome, lalu izinkan unduhan untuk halaman ini. Jika masih gagal, muat ulang halaman dan coba kembali.');
+            }
         }
     </script>
 </body>
