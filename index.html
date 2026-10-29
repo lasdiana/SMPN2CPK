@@ -211,7 +211,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Link Google Drive Pengumpulan Tugas</label>
-                        <input type="url" id="g-drive-login" required placeholder="https://drive.google.com/drive/folders/..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="url" id="g-drive-login" required value="https://drive.google.com/drive/u/2/folders/1rfOmoevZaRAvBVcKOf5KY70aMTB8mGRc" placeholder="Tautan folder utama Google Drive" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <p class="text-xs text-slate-400 mt-1">*Link folder Google Drive Anda agar siswa bisa mengunggah tugas.</p>
                     </div>
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow">
@@ -677,6 +677,87 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // PENTING: setelah Apps Script diterbitkan sebagai Web App, tempel URL /exec di bawah.
+        const DRIVE_UPLOAD_WEB_APP_URL = "TEMPEL_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
+        const DRIVE_ROOT_FOLDER_ID = "1rfOmoevZaRAvBVcKOf5KY70aMTB8mGRc";
+        const selectedTaskFiles = new Map();
+        let driveUploadFrameReady = false;
+        let driveUploadResolve = null;
+        let driveUploadReject = null;
+
+        // Form tersembunyi mengirim file ke Apps Script tanpa masalah CORS.
+        window.addEventListener("message", function(event) {
+            if (!event.data || event.data.type !== "SIPGURU_DRIVE_UPLOAD_RESULT") return;
+            if (event.data.ok) {
+                if (driveUploadResolve) driveUploadResolve(event.data);
+            } else {
+                if (driveUploadReject) driveUploadReject(new Error(event.data.error || "Unggah ke Drive gagal."));
+            }
+            driveUploadResolve = null;
+            driveUploadReject = null;
+        });
+
+        function uploadFileToDrive(file, metadata) {
+            return new Promise((resolve, reject) => {
+                if (!DRIVE_UPLOAD_WEB_APP_URL || DRIVE_UPLOAD_WEB_APP_URL.includes("TEMPEL_URL")) {
+                    reject(new Error("Penghubung Google Drive belum dipasang. Ikuti panduan Apps Script dan tempel URL Web App pada DRIVE_UPLOAD_WEB_APP_URL di file HTML."));
+                    return;
+                }
+                if (file.size > 8 * 1024 * 1024) {
+                    reject(new Error("Ukuran file maksimal 8 MB. Silakan kecilkan ukuran foto/PDF lalu coba lagi."));
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error("File tidak dapat dibaca oleh browser."));
+                reader.onload = () => {
+                    const dataUrl = String(reader.result || "");
+                    const base64 = dataUrl.split(",")[1];
+                    if (!base64) { reject(new Error("Isi file tidak terbaca.")); return; }
+                    const payload = {
+                        rootFolderId: DRIVE_ROOT_FOLDER_ID,
+                        fileName: file.name,
+                        mimeType: file.type || "application/octet-stream",
+                        base64,
+                        mapel: metadata.mapel,
+                        kelas: metadata.kelas,
+                        namaSiswa: metadata.namaSiswa,
+                        judulTugas: metadata.judulTugas,
+                        tugasId: metadata.tugasId
+                    };
+                    let iframe = document.getElementById("sipguru-drive-upload-frame");
+                    if (!iframe) {
+                        iframe = document.createElement("iframe");
+                        iframe.id = "sipguru-drive-upload-frame";
+                        iframe.name = "sipguru-drive-upload-frame";
+                        iframe.style.display = "none";
+                        document.body.appendChild(iframe);
+                    }
+                    const form = document.createElement("form");
+                    form.method = "POST";
+                    form.action = DRIVE_UPLOAD_WEB_APP_URL;
+                    form.target = iframe.name;
+                    form.style.display = "none";
+                    const field = document.createElement("input");
+                    field.type = "hidden";
+                    field.name = "payload";
+                    field.value = JSON.stringify(payload);
+                    form.appendChild(field);
+                    document.body.appendChild(form);
+                    driveUploadResolve = (result) => { form.remove(); resolve(result); };
+                    driveUploadReject = (error) => { form.remove(); reject(error); };
+                    form.submit();
+                    // Timeout agar siswa tidak menunggu tanpa batas jika URL salah.
+                    setTimeout(() => {
+                        if (driveUploadResolve) {
+                            driveUploadResolve = null; driveUploadReject = null; form.remove();
+                            reject(new Error("Belum ada balasan dari Apps Script. Periksa URL Web App dan izin aksesnya."));
+                        }
+                    }, 60000);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         const listKelas = [];
         ['7', '8', '9'].forEach(tingkat => {
             ['A', 'B', 'C', 'D', 'E', 'F'].forEach(huruf => {
@@ -979,7 +1060,7 @@
                         ${t.fileData ? `<a href="${t.fileData}" download="${t.fileName}" class="inline-block mt-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-download mr-1"></i> Unduh Soal Tugas</a>` : ''}
                         
                         <div class="mt-4 pt-4 border-t space-y-3 bg-indigo-50/50 p-3 rounded-xl border-indigo-100">
-                            <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Cara Mengirim Tugas ke Guru:</p>
+                            <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Kirim Tugas ke Google Drive:</p>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 ${driveLink ? `
@@ -1004,17 +1085,17 @@
                                     </label>
                                 </div>
                             </div>
-                            <p class="text-[10px] text-slate-500 italic">*Pilih <b>"Foto Langsung"</b> untuk memotret lembar jawaban dengan kamera HP, atau <b>"Pilih File/Doc"</b> untuk mengambil dari galeri/penyimpanan, lalu unggah ke Drive Guru.</p>
+                            <p class="text-[10px] text-slate-500 italic">Pilih foto/PDF/Word, tulis jawaban bila perlu, lalu tekan tombol kirim. File akan dimasukkan ke folder mata pelajaran dan kelas di Drive sekolah. Maksimal 8 MB per file.</p>
 
                             <div class="mt-3 pt-3 border-t space-y-2">
-                                <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-check-double mr-1"></i> 3. Konfirmasi Penyelesaian Tugas:</p>
+                                <p class="text-xs font-bold text-indigo-900"><i class="fa-solid fa-check-double mr-1"></i> Jawaban / catatan (boleh dikosongkan jika melampirkan file):</p>
                                 ${sudahKirim ? `
                                     <div class="bg-green-50 text-green-700 p-2 rounded-lg text-xs font-bold border border-green-200 flex items-center justify-between">
                                         <span><i class="fa-solid fa-check-circle mr-1"></i> Terkirim: ${sudahKirim.jawaban}</span>
                                     </div>
                                 ` : `
                                     <input type="text" id="konfirmasi-${t.id}" placeholder="Nama file yang diunggah / Catatan selesai..." class="w-full px-3 py-2 text-xs rounded-lg border bg-white focus:ring-1 focus:ring-indigo-500 outline-none">
-                                    <button onclick="kirimKonfirmasiTugas('${t.id}', '${t.judul.replace(/'/g, "")}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded-lg font-bold transition shadow">Kirim Konfirmasi ke Guru</button>
+                                    <button onclick="kirimKonfirmasiTugas('${t.id}', '${t.judul.replace(/'/g, "")}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs py-2 rounded-lg font-bold transition shadow">Kirim Tugas ke Drive & Guru</button>
                                 `}
                             </div>
                         </div>
@@ -1026,13 +1107,17 @@
         }
 
         window.pilihFileTugas = function(inputElement, tugasId) {
-            if(inputElement.files && inputElement.files[0]) {
-                const fileName = inputElement.files[0].name;
+            if (inputElement.files && inputElement.files[0]) {
+                const file = inputElement.files[0];
+                selectedTaskFiles.set(String(tugasId), file);
                 const konfirmasiInput = document.getElementById(`konfirmasi-${tugasId}`);
-                if(konfirmasiInput) {
-                    konfirmasiInput.value = `File terpilih: ${fileName}`;
+                if (konfirmasiInput && !konfirmasiInput.value.trim()) konfirmasiInput.value = `Lampiran: ${file.name}`;
+                const label = inputElement.closest("label");
+                if (label) {
+                    const span = label.querySelector("span");
+                    if (span) span.textContent = file.name.length > 24 ? file.name.slice(0, 21) + "..." : file.name;
                 }
-                alert(`File "${fileName}" berhasil dipilih! Silakan klik tombol "Buka Drive Guru" untuk mengunggahnya, lalu klik "Kirim Konfirmasi ke Guru".`);
+                alert(`File "${file.name}" dipilih. Tekan tombol "Kirim Tugas ke Drive & Guru" untuk mengunggahnya.`);
             }
         }
 
@@ -1069,26 +1154,49 @@
 
         window.kirimKonfirmasiTugas = async function(tugasId, judulTugas) {
             const input = document.getElementById(`konfirmasi-${tugasId}`);
-            const jawabanVal = input.value.trim() || 'Tugas sudah diunggah.';
-            if(!currentSiswaSession) return;
-
-            const newJawaban = {
-                tugasId, judulTugas,
-                namaSiswa: currentSiswaSession.nama,
-                kelas: currentSiswaSession.kelas,
-                mapel: currentSiswaSession.mapel,
-                jawaban: jawabanVal,
-                waktu: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
-                timestamp: Date.now()
-            };
-
+            const jawabanVal = input ? input.value.trim() : "";
+            if (!currentSiswaSession) { alert("Sesi siswa tidak ditemukan. Silakan masuk kembali."); return; }
+            const file = selectedTaskFiles.get(String(tugasId)) || null;
+            if (!file && !jawabanVal) {
+                alert("Pilih file tugas atau isi jawaban/catatan terlebih dahulu.");
+                return;
+            }
+            const buttons = Array.from(document.querySelectorAll("button")).filter(b => b.getAttribute("onclick") && b.getAttribute("onclick").includes(`kirimKonfirmasiTugas('${tugasId}'`));
+            buttons.forEach(b => { b.disabled = true; b.dataset.originalText = b.innerText; b.innerText = "Mengirim... jangan tutup halaman"; });
             try {
+                let fileUrl = "";
+                let fileName = "";
+                if (file) {
+                    const uploadResult = await uploadFileToDrive(file, {
+                        mapel: currentSiswaSession.mapel,
+                        kelas: currentSiswaSession.kelas,
+                        namaSiswa: currentSiswaSession.nama,
+                        judulTugas,
+                        tugasId: String(tugasId)
+                    });
+                    fileUrl = uploadResult.fileUrl || "";
+                    fileName = uploadResult.fileName || file.name;
+                }
+                const newJawaban = {
+                    tugasId: String(tugasId), judulTugas,
+                    namaSiswa: currentSiswaSession.nama,
+                    kelas: currentSiswaSession.kelas,
+                    mapel: currentSiswaSession.mapel,
+                    jawaban: jawabanVal || (fileName ? `Mengumpulkan file: ${fileName}` : "Tugas dikirim."),
+                    fileName, fileUrl,
+                    waktu: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+                    timestamp: Date.now()
+                };
                 await addDoc(collection(db, "jawaban"), newJawaban);
+                selectedTaskFiles.delete(String(tugasId));
                 await fetchAllDataFromCloud();
-                alert("Konfirmasi tugas berhasil dikirim ke guru!");
+                alert(file ? "Berhasil! File tugas telah diunggah ke Google Drive dan konfirmasi dikirim ke guru." : "Jawaban/konfirmasi berhasil dikirim ke guru.");
                 loadRuangBelajarSiswa(currentSiswaSession.mapel, currentSiswaSession.kelas);
             } catch(err) {
-                alert("Gagal mengirim konfirmasi: " + err.message);
+                console.error(err);
+                alert("Tugas belum berhasil dikirim. " + (err && err.message ? err.message : "Periksa koneksi dan pengaturan Apps Script."));
+            } finally {
+                buttons.forEach(b => { b.disabled = false; b.innerText = b.dataset.originalText || "Kirim Tugas ke Drive & Guru"; });
             }
         }
 
@@ -1202,7 +1310,7 @@
                     <td class="p-3 font-bold text-slate-800">${j.namaSiswa}</td>
                     <td class="p-3">${j.kelas}</td>
                     <td class="p-3 font-semibold text-indigo-600">${j.judulTugas}</td>
-                    <td class="p-3 text-slate-700 whitespace-pre-line">${j.jawaban}</td>
+                    <td class="p-3 text-slate-700 whitespace-pre-line">${j.jawaban || '-'}${j.fileUrl ? `<div class="mt-1"><a href="${j.fileUrl}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-blue-700 underline font-semibold"><i class="fa-brands fa-google-drive"></i> Buka file: ${j.fileName || 'Lampiran tugas'}</a></div>` : ''}</td>
                 </tr>
             `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-400 italic">Belum ada konfirmasi tugas.</td></tr>`;
         }
